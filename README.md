@@ -31,7 +31,7 @@ This repository is prepared for Progress Report 3 submission.
 | Nada Mohammad Ibrahim Ali | Customer Interface and Order Management | [Home page](https://citron-dodge-83106591.figma.site/), product display, product details, cart, checkout, payment upload, order history, receipt, profile, contact page, admin login entry |
 | Nawseedah | Inventory Management | Product inventory, material inventory, stock in, stock out, inventory history, supplier management, low stock monitoring |
 | Wu Yuqi | Staff and Task Management | [Staff management](https://wool-caper-77320215.figma.site/admin/staff), [task management](https://wool-caper-77320215.figma.site/admin/tasks), [staff contribution record](https://wool-caper-77320215.figma.site/admin/contribution) |
-| Bao Yilin | [Financial Tracking and Reporting](https://wool-caper-77320215.figma.site/admin/financial)| Financial records, income record, expense record, transaction list, [report generation](https://wool-caper-77320215.figma.site/admin/reports), sales report, business overview |
+| Bao Yilin | Financial Tracking and Reporting| [Financial records, income record, expense record, transaction list](https://wool-caper-77320215.figma.site/admin/financial), [report generation, sales report, business overview](https://wool-caper-77320215.figma.site/admin/reports) |
 
 ---
 
