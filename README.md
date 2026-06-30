@@ -38,3 +38,23 @@ This repository is prepared for Progress Report 3 submission.
 ## Current Status
 
 The current version focuses on the frontend high-fidelity prototype, GitHub documentation, and project management preparation for Progress Report 3. Backend and database implementation are not included in this progress stage.
+
+## Database Schema
+Module 1: Order & Customer Management
+The database schema for each module is defined below.
+
+| Module | Table | Fields |
+|--------|-------|--------|
+| **Module 1: Order & Customer** | `customers` | customer_id (PK), name, email, phone, address, registration_date, status, created_at |
+| | `orders` | order_id (PK), customer_id (FK), order_date, total_amount, status, payment_status, notes |
+| **Module 2: Inventory** | `products` | product_id (PK), name, description, category, price, stock_quantity, unit, reorder_level, created_at |
+| | `materials` | material_id (PK), name, category, supplier, stock_quantity, unit, reorder_level, created_at |
+| | `suppliers` | supplier_id (PK), name, contact_person, phone, email, address, created_at |
+| **Module 3: Staff & Task** | `staff` | staff_id (PK), name, email, phone, position, department, hire_date, status, created_at |
+| | `tasks` | task_id (PK), title, description, assigned_to (FK), assigned_by (FK), priority, status, due_date, created_at |
+| | `contributions` | contribution_id (PK), staff_id (FK), task_id (FK), contribution_date, hours, description |
+| **Module 4: Financial & Report** | `admins` | admin_id (PK), full_name, email, password_hash, role, phone, status, created_at |
+| | `financial_records` | record_id (PK), type, amount, category, description, reference_id, reference_type, recorded_by (FK), recorded_date, receipt_image, notes, created_at |
+| | `order_payments` | payment_id (PK), order_id (FK), financial_record_id (FK), status, payment_date, payment_amount, payment_method, transaction_id, notes |
+| | `community_activities` | activity_id (PK), name, date, collected_quantity, collected_weight_kg, contributor_count, outcome_description, carbon_saved_kg, recorded_by (FK), created_at |
+| | `reports` | report_id (PK), type, name, start_date, end_date, generated_by (FK), generated_at, file_path, data_snapshot |
