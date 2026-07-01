@@ -50,9 +50,13 @@ The database schema for each module is defined below.
 | **Module 2: Inventory** | ` ` |   |
 | | `` |   |
 | | ` ` |   |
-| **Module 3: Staff & Task** | `  ` |    |
-| | ` ` |    |
-| | `   ` |    |
+| **Module 3: Staff & Task** | `admin` | admin_id (PK), admin_name, email, role, password_hash, status, created_at |
+|  | `staff` | staff_id (PK), admin_id (FK), staff_name, email, contact_number, role, joining_date, status, availability_status, remarks, created_at, updated_at |
+|  | `staff_status_log` | status_log_id (PK), staff_id (FK), admin_id (FK), previous_status, new_status, reason, updated_at |
+|  | `task` | task_id (PK), admin_id (FK), staff_id (FK), task_title, task_description, task_category, priority, target_quantity, unit, due_date, assigned_date, status, progress_percentage, progress_remarks, created_at, updated_at |
+|  | `task_progress_log` | progress_log_id (PK), task_id (FK), admin_id (FK), previous_status, new_status, progress_percentage, completed_quantity, progress_remarks, updated_date, created_at |
+|  | `contribution_record` | contribution_id (PK), task_id (FK), staff_id (FK), contribution_type, completion_date, quality_outcome, contribution_details, admin_remarks, recorded_by (FK), recorded_date, review_status, created_at |
+|  | `contribution_review` | review_id (PK), contribution_id (FK), reviewed_by (FK), review_date, review_decision, review_notes, created_at |
 | **Module 4: Financial & Report** | `Admin` |  admin_id (PK), full_name, email, password_hash, role, phone, status, created_at |
 | | `financial_records` | record_id (PK), type, amount, category, description, reference_id, reference_type, recorded_by (FK → admins), recorded_date, receipt_image, notes, created_at, created_at |
 | | `order_payments` | payment_id (PK), order_id (FK) , status, payment_date, payment_amount, payment_method, created_at |
