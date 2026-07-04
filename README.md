@@ -44,9 +44,21 @@ The database schema for each module is defined below.
 
 | Module | Table | Fields |
 |--------|-------|--------|
-| **Module 1: Order & Customer** | `  ` |  |
-| | `  ` | |
-| |` `|   |
+| **Module 1: Order & Customer** | `Customer` | customer_ID (PK), full_name, email, password_hash, phone_number, delivery_address, account_status (ENUM), created_at, updated_at |
+| | `Admin` | admin_ID (PK), full_name, email, phone_number, password_hash, role (ENUM: Admin, SuperAdmin), created_at |
+| | `Login_LOG` | log_ID (PK), user_ID, user_type (ENUM: Customer, Admin), login_at, ip_address, status (ENUM: Success, Fail) |
+| | `Account_Audit_LOG` | audit_ID (PK), admin_ID (FK), customer_ID (FK), action_type (ENUM: StatusUpdate, ProfileUpdate, Terminate), action_at, notes |
+| | `Product` | product_ID (PK), product_name, description, unit_price, stock_quantity, status (ENUM: Available, Outofstock, Discontinued) |
+| | `Cart` | cart_ID (PK), customer_ID (FK), created_at, updated_at |
+| | `Cart_Item` | cart_item_ID (PK), cart_ID (FK), product_ID (FK), quantity, subtotal |
+| | `Order_record` | order_ID (PK), customer_ID (FK), order_date, total_amount, order_status (ENUM: Pending Payment, Awaiting Shipping, Shipped, Delivered, Completed, Cancelled), cancellation_reason, cancelled_at |
+| | `Order_Item` | order_item_ID (PK), order_ID (FK), product_ID (FK), quantity, unit_price, subtotal |
+| | `Payment_record` | payment_ID (PK), order_ID (FK), customer_ID (FK), payment_method (ENUM: Online Banking, Credit Card, Debit Card, E-Wallet), payment_status (ENUM: Processing, Verified, Failed, Flagged), payment_date, transaction_reference |
+| | `Payment_verification` | verification_ID (PK), payment_ID (FK), admin_ID (FK), verification_status (ENUM: Verified, Flagged), flag_reason, verified_at |
+| | `Payment_receipt` | receipt_ID (PK), payment_ID (FK), order_ID (FK), issued_at, total_amount, receipt_data |
+| | `Shipment` | shipment_ID (PK), order_ID (FK), tracking_number, carrier, current_status (ENUM: Processing, Shipped, Delivered), delivery_address, estimated_delivery, actual_delivery |
+| | `Delivery_status_LOG` | status_log_ID (PK), shipment_ID (FK), admin_ID (FK), status_value (ENUM: Processing, Shipped, Delivered), notes, updated_at |
+| | `Order_confirmation` | confirmation_ID (PK), order_ID (FK), customer_ID (FK), confirmed_at, confirmation_note |
 | **Module 2: Inventory** | ` adminProfile ` |  accountEmail (PK), password |
 | | ` Product ` |  productID (PK), productName, category, stock, price, status (ENUM: in stock, low stock, out of stock)   |
 | | ` productDetails ` |   productID, productName, category, stock, price, statusStock (ENUM), stockListing (ENUM), productDesc, createdDate, lastUpdated  |
