@@ -45,15 +45,29 @@ The database schema for each module is defined below.
 
 | Module | Table | Fields |
 |--------|-------|--------|
-| **Module 1: Order & Customer** | ` Product ` |  productID (PK), productName, category, stock, price, status (ENUM: in stock, low stock, out of stock)  |
-| | ` productDetails  ` |  productID, productName, category, stock, price, statusStock (ENUM), stockListing (ENUM), productDesc, createdDate, lastUpdated |
-| | ` newProduct  ` ` editProduct  ` ` deleteProduct ` |  productID, productName, category, stock, price, status (ENUM), productDesc |
-| | ` editProduct  ` |  productID, productName, category, stock, price, statusStock (ENUM), stockListing (ENUM), productDesc, createdDate, lastUpdated |
-| | ` productDetails  ` |  productID, productName, category, stock, price, statusStock (ENUM), stockListing (ENUM), productDesc, createdDate, lastUpdated |
+| **Module 1: Order & Customer** | `  ` |  |
+| | `  ` | |
+| |` `|   |
 
-| **Module 2: Inventory** | ` ` |   |
-| | `` |   |
-| | ` ` |   |
+
+
+| **Module 2: Inventory** | ` adminProfile ` |  accountEmail (PK), password   |
+| | ` Product ` |  productID (PK), productName, category, stock, price, status (ENUM: in stock, low stock, out of stock)   |
+| | ` productDetails ` |   productID, productName, category, stock, price, statusStock (ENUM), stockListing (ENUM), productDesc, createdDate, lastUpdated  |
+| |  ` newProduct  ` ` editProduct  ` ` deleteProduct `  | productID, productName, category, stock, price, status (ENUM), productDesc  |
+| | ` Materials ` |  materialID (PK), materialName, category, quantity, source, status (ENUM) |
+| | ` newMaterials  ` | materialName, unit, category, quantity, source, supplier, remarks |
+| | ` materialsDetail ` | materialsID, materialName, unit, category, quantity, lastUpdated, supplier, remarks, source, storageLocation  |
+| | ` stockIn ` | materialsID, materialName, quantityAdded, stockDateAdded, source, remarks  |
+| | ` stockOut ` | materialsID, materialName, quantityDeducted, stockDateDeducted, usedFor, remarks  |
+| | ` inventoryHistory ` | TXNID (PK), materialsID, materialName, date, category, quantityChange, type (ENUM), unit, sourceOrUsedFor, recordedBy, remarks  |
+| | ` summaryReport ` | reportType (ENUM), startDate, endDate  |
+| | ` 	supplier ` | supplierID (PK), supplierName (PK), contactNumber, email, suppliedMaterials, status (ENUM)  |
+| | ` supplierDetails ` | supplierID, supplierName, contactNumber, email, suppliedMaterials, status (ENUM), address, remarks, createdDate |
+| | ` editSupplier ` | supplierID, supplierName, contactNumber, email, suppliedMaterials, status (ENUM), address, remarks   |
+| | ` newSupplier ` | supplierName, contactNumber, email, suppliedMaterials, status (ENUM), address  |
+
+
 | **Module 3: Staff & Task** | `admin` | admin_id (PK), admin_name, email, role, password_hash, status, created_at |
 |  | `staff` | staff_id (PK), admin_id (FK), staff_name, email, contact_number, role, joining_date, status, availability_status, remarks, created_at, updated_at |
 |  | `staff_status_log` | status_log_id (PK), staff_id (FK), admin_id (FK), previous_status, new_status, reason, updated_at |
