@@ -1,0 +1,509 @@
+-- ============================================
+-- INVENTORY MANAGEMENT SUBSYSTEM
+-- Module 2: Inventory Management
+-- ============================================
+
+-- ============================================
+-- 4.1 INVENTORY RECORD MANAGEMENT MODULE
+-- ============================================
+
+-- Admin Profile Table (references from other modules)
+CREATE TABLE adminProfile (
+    accountEmail VARCHAR(100) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL
+);
+
+-- Product Table
+CREATE TABLE Product (
+    productID VARCHAR(50) PRIMARY KEY,
+    productName VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    stock INT DEFAULT 0,
+    price DECIMAL(10,2) DEFAULT 0.00,
+    status ENUM('in stock', 'low stock', 'out of stock') DEFAULT 'in stock',
+    accountEmail VARCHAR(100),
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- Product Details View (stored as table for UI purposes)
+CREATE TABLE productDetails (
+    productID VARCHAR(50) PRIMARY KEY,
+    productName VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    stock INT DEFAULT 0,
+    price DECIMAL(10,2) DEFAULT 0.00,
+    statusStock ENUM('in stock', 'low stock', 'out of stock') DEFAULT 'in stock',
+    stockListing ENUM('active', 'inactive') DEFAULT 'active',
+    productDesc TEXT,
+    createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (productID) REFERENCES Product(productID)
+);
+
+-- New Product Entry
+CREATE TABLE newProduct (
+    productID VARCHAR(50) PRIMARY KEY,
+    productName VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    stock INT DEFAULT 0,
+    price DECIMAL(10,2) DEFAULT 0.00,
+    status ENUM('in stock', 'low stock', 'out of stock') DEFAULT 'in stock',
+    productDesc TEXT,
+    accountEmail VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- Edit Product Entry
+CREATE TABLE editProduct (
+    productID VARCHAR(50) PRIMARY KEY,
+    productName VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    stock INT DEFAULT 0,
+    price DECIMAL(10,2) DEFAULT 0.00,
+    status ENUM('in stock', 'low stock', 'out of stock') DEFAULT 'in stock',
+    productDesc TEXT,
+    accountEmail VARCHAR(100),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- Delete Product Entry (for logging deleted products)
+CREATE TABLE deleteProduct (
+    productID VARCHAR(50) PRIMARY KEY,
+    productName VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    stock INT DEFAULT 0,
+    price DECIMAL(10,2) DEFAULT 0.00,
+    status ENUM('in stock', 'low stock', 'out of stock') DEFAULT 'in stock',
+    productDesc TEXT,
+    deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_by VARCHAR(100),
+    FOREIGN KEY (deleted_by) REFERENCES adminProfile(accountEmail)
+);
+
+-- ============================================
+-- 4.2 STOCK QUANTITY MANAGEMENT MODULE
+-- ============================================
+
+-- Materials Table
+CREATE TABLE Materials (
+    materialID VARCHAR(50) PRIMARY KEY,
+    materialName VARCHAR(100) NOT NULL,
+    category VARCHAR(50),
+    quantity INT DEFAULT 0,
+    source VARCHAR(100),
+    status ENUM('in stock', 'low stock', 'out of stock') DEFAULT 'in stock',
+    accountEmail VARCHAR(100),
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- New Materials Entry
+CREATE TABLE newMaterials (
+    materialID VARCHAR(50) PRIMARY KEY,
+    materialName VARCHAR(100) NOT NULL,
+    unit VARCHAR(20),
+    category VARCHAR(50),
+    quantity INT DEFAULT 0,
+    source VARCHAR(100),
+    supplier VARCHAR(100),
+    remarks TEXT,
+    accountEmail VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- Materials Detail
+CREATE TABLE materialsDetail (
+    materialsID VARCHAR(50) PRIMARY KEY,
+    materialName VARCHAR(100) NOT NULL,
+    unit VARCHAR(20),
+    category VARCHAR(50),
+    quantity INT DEFAULT 0,
+    lastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    supplier VARCHAR(100),
+    remarks TEXT,
+    source VARCHAR(100),
+    storageLocation VARCHAR(100),
+    FOREIGN KEY (materialsID) REFERENCES Materials(materialID)
+);
+
+-- Stock In (Add Stock)
+CREATE TABLE stockIn (
+    stockInID INT AUTO_INCREMENT PRIMARY KEY,
+    materialsID VARCHAR(50),
+    materialName VARCHAR(100) NOT NULL,
+    quantityAdded INT DEFAULT 0,
+    stockDateAdded TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    source VARCHAR(100),
+    remarks TEXT,
+    accountEmail VARCHAR(100),
+    FOREIGN KEY (materialsID) REFERENCES Materials(materialID),
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- Stock Out (Deduct Stock / Usage)
+CREATE TABLE stockOut (
+    stockOutID INT AUTO_INCREMENT PRIMARY KEY,
+    materialsID VARCHAR(50),
+    materialName VARCHAR(100) NOT NULL,
+    quantityDeducted INT DEFAULT 0,
+    stockDateDeducted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    usedFor VARCHAR(200),
+    remarks TEXT,
+    accountEmail VARCHAR(100),
+    FOREIGN KEY (materialsID) REFERENCES Materials(materialID),
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- ============================================
+-- 4.3 INVENTORY HISTORY TRACKING MODULE
+-- ============================================
+
+-- Inventory History (Transaction Log)
+CREATE TABLE inventoryHistory (
+    TXNID VARCHAR(50) PRIMARY KEY,
+    materialsID VARCHAR(50),
+    materialName VARCHAR(100) NOT NULL,
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    category VARCHAR(50),
+    quantityChange INT NOT NULL,
+    type ENUM('add', 'deduct', 'update') NOT NULL,
+    unit VARCHAR(20),
+    sourceOrUsedFor VARCHAR(200),
+    recordedBy VARCHAR(100),
+    remarks TEXT,
+    FOREIGN KEY (materialsID) REFERENCES Materials(materialID),
+    FOREIGN KEY (recordedBy) REFERENCES adminProfile(accountEmail)
+);
+
+-- Summary Report
+CREATE TABLE summaryReport (
+    reportID INT AUTO_INCREMENT PRIMARY KEY,
+    reportType ENUM('sales report', 'inventory report', 'stock report') NOT NULL,
+    startDate TIMESTAMP,
+    endDate TIMESTAMP,
+    generatedBy VARCHAR(100),
+    generatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (generatedBy) REFERENCES adminProfile(accountEmail)
+);
+
+-- ============================================
+-- 4.4 SUPPLIER AND MATERIAL MONITORING MODULE
+-- ============================================
+
+-- Supplier Table
+CREATE TABLE supplier (
+    supplierID VARCHAR(50) PRIMARY KEY,
+    supplierName VARCHAR(100) NOT NULL UNIQUE,
+    contactNumber VARCHAR(20),
+    email VARCHAR(100),
+    suppliedMaterials VARCHAR(200),
+    status ENUM('active', 'deactive') DEFAULT 'active',
+    accountEmail VARCHAR(100),
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- Supplier Details
+CREATE TABLE supplierDetails (
+    supplierID VARCHAR(50) PRIMARY KEY,
+    supplierName VARCHAR(100) NOT NULL,
+    contactNumber VARCHAR(20),
+    email VARCHAR(100),
+    suppliedMaterials VARCHAR(200),
+    status ENUM('active', 'deactive') DEFAULT 'active',
+    address TEXT,
+    remarks TEXT,
+    createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (supplierID) REFERENCES supplier(supplierID)
+);
+
+-- Edit Supplier
+CREATE TABLE editSupplier (
+    supplierID VARCHAR(50) PRIMARY KEY,
+    supplierName VARCHAR(100) NOT NULL,
+    contactNumber VARCHAR(20),
+    email VARCHAR(100),
+    suppliedMaterials VARCHAR(200),
+    status ENUM('active', 'deactive') DEFAULT 'active',
+    address TEXT,
+    remarks TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    accountEmail VARCHAR(100),
+    FOREIGN KEY (supplierID) REFERENCES supplier(supplierID),
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- New Supplier
+CREATE TABLE newSupplier (
+    supplierID VARCHAR(50) PRIMARY KEY,
+    supplierName VARCHAR(100) NOT NULL,
+    contactNumber VARCHAR(20),
+    email VARCHAR(100),
+    suppliedMaterials VARCHAR(200),
+    status ENUM('active', 'deactive') DEFAULT 'active',
+    address TEXT,
+    accountEmail VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (accountEmail) REFERENCES adminProfile(accountEmail)
+);
+
+-- ============================================
+-- TRIGGERS FOR AUTOMATIC UPDATES
+-- ============================================
+
+-- Trigger: Update product status based on stock level
+DELIMITER //
+CREATE TRIGGER update_product_status
+BEFORE UPDATE ON Product
+FOR EACH ROW
+BEGIN
+    IF NEW.stock <= 0 THEN
+        SET NEW.status = 'out of stock';
+    ELSEIF NEW.stock <= 10 THEN
+        SET NEW.status = 'low stock';
+    ELSE
+        SET NEW.status = 'in stock';
+    END IF;
+END//
+DELIMITER ;
+
+-- Trigger: Update material status based on quantity
+DELIMITER //
+CREATE TRIGGER update_material_status
+BEFORE UPDATE ON Materials
+FOR EACH ROW
+BEGIN
+    IF NEW.quantity <= 0 THEN
+        SET NEW.status = 'out of stock';
+    ELSEIF NEW.quantity <= 10 THEN
+        SET NEW.status = 'low stock';
+    ELSE
+        SET NEW.status = 'in stock';
+    END IF;
+END//
+DELIMITER ;
+
+-- Trigger: Log inventory history when stock is added
+DELIMITER //
+CREATE TRIGGER log_stock_in
+AFTER INSERT ON stockIn
+FOR EACH ROW
+BEGIN
+    INSERT INTO inventoryHistory (
+        TXNID, materialsID, materialName, date, category, 
+        quantityChange, type, unit, sourceOrUsedFor, recordedBy, remarks
+    ) VALUES (
+        CONCAT('TXN-', UUID()),
+        NEW.materialsID,
+        NEW.materialName,
+        NEW.stockDateAdded,
+        (SELECT category FROM Materials WHERE materialID = NEW.materialsID),
+        NEW.quantityAdded,
+        'add',
+        (SELECT unit FROM materialsDetail WHERE materialsID = NEW.materialsID),
+        NEW.source,
+        NEW.accountEmail,
+        NEW.remarks
+    );
+    
+    -- Update Materials quantity
+    UPDATE Materials 
+    SET quantity = quantity + NEW.quantityAdded 
+    WHERE materialID = NEW.materialsID;
+END//
+DELIMITER ;
+
+-- Trigger: Log inventory history when stock is deducted
+DELIMITER //
+CREATE TRIGGER log_stock_out
+AFTER INSERT ON stockOut
+FOR EACH ROW
+BEGIN
+    INSERT INTO inventoryHistory (
+        TXNID, materialsID, materialName, date, category, 
+        quantityChange, type, unit, sourceOrUsedFor, recordedBy, remarks
+    ) VALUES (
+        CONCAT('TXN-', UUID()),
+        NEW.materialsID,
+        NEW.materialName,
+        NEW.stockDateDeducted,
+        (SELECT category FROM Materials WHERE materialID = NEW.materialsID),
+        -NEW.quantityDeducted,
+        'deduct',
+        (SELECT unit FROM materialsDetail WHERE materialsID = NEW.materialsID),
+        NEW.usedFor,
+        NEW.accountEmail,
+        NEW.remarks
+    );
+    
+    -- Update Materials quantity
+    UPDATE Materials 
+    SET quantity = quantity - NEW.quantityDeducted 
+    WHERE materialID = NEW.materialsID;
+END//
+DELIMITER ;
+
+-- ============================================
+-- STORED PROCEDURES
+-- ============================================
+
+-- Procedure: Add new product
+DELIMITER //
+CREATE PROCEDURE addNewProduct(
+    IN p_productID VARCHAR(50),
+    IN p_productName VARCHAR(100),
+    IN p_category VARCHAR(50),
+    IN p_stock INT,
+    IN p_price DECIMAL(10,2),
+    IN p_productDesc TEXT,
+    IN p_accountEmail VARCHAR(100)
+)
+BEGIN
+    INSERT INTO Product (productID, productName, category, stock, price, productDesc, accountEmail)
+    VALUES (p_productID, p_productName, p_category, p_stock, p_price, p_productDesc, p_accountEmail);
+    
+    INSERT INTO productDetails (productID, productName, category, stock, price, productDesc)
+    VALUES (p_productID, p_productName, p_category, p_stock, p_price, p_productDesc);
+    
+    INSERT INTO newProduct (productID, productName, category, stock, price, productDesc, accountEmail)
+    VALUES (p_productID, p_productName, p_category, p_stock, p_price, p_productDesc, p_accountEmail);
+END//
+DELIMITER ;
+
+-- Procedure: Add new material
+DELIMITER //
+CREATE PROCEDURE addNewMaterial(
+    IN p_materialID VARCHAR(50),
+    IN p_materialName VARCHAR(100),
+    IN p_category VARCHAR(50),
+    IN p_quantity INT,
+    IN p_source VARCHAR(100),
+    IN p_supplier VARCHAR(100),
+    IN p_unit VARCHAR(20),
+    IN p_storageLocation VARCHAR(100),
+    IN p_accountEmail VARCHAR(100)
+)
+BEGIN
+    INSERT INTO Materials (materialID, materialName, category, quantity, source, accountEmail)
+    VALUES (p_materialID, p_materialName, p_category, p_quantity, p_source, p_accountEmail);
+    
+    INSERT INTO materialsDetail (materialsID, materialName, category, quantity, supplier, source, unit, storageLocation)
+    VALUES (p_materialID, p_materialName, p_category, p_quantity, p_supplier, p_source, p_unit, p_storageLocation);
+    
+    INSERT INTO newMaterials (materialID, materialName, category, quantity, source, supplier, unit, accountEmail)
+    VALUES (p_materialID, p_materialName, p_category, p_quantity, p_source, p_supplier, p_unit, p_accountEmail);
+END//
+DELIMITER ;
+
+-- Procedure: Get low stock items
+DELIMITER //
+CREATE PROCEDURE getLowStockItems()
+BEGIN
+    SELECT materialID, materialName, category, quantity, status
+    FROM Materials
+    WHERE status = 'low stock' OR status = 'out of stock'
+    ORDER BY quantity ASC;
+END//
+DELIMITER ;
+
+-- Procedure: Generate inventory summary
+DELIMITER //
+CREATE PROCEDURE generateInventorySummary(
+    IN p_reportType VARCHAR(50),
+    IN p_startDate TIMESTAMP,
+    IN p_endDate TIMESTAMP,
+    IN p_accountEmail VARCHAR(100)
+)
+BEGIN
+    -- Insert into summaryReport
+    INSERT INTO summaryReport (reportType, startDate, endDate, generatedBy)
+    VALUES (p_reportType, p_startDate, p_endDate, p_accountEmail);
+    
+    -- Return summary data
+    SELECT 
+        COUNT(DISTINCT productID) as totalProducts,
+        SUM(stock) as totalStock,
+        AVG(price) as averagePrice,
+        COUNT(CASE WHEN status = 'low stock' THEN 1 END) as lowStockCount,
+        COUNT(CASE WHEN status = 'out of stock' THEN 1 END) as outOfStockCount
+    FROM Product;
+END//
+DELIMITER ;
+
+-- ============================================
+-- SAMPLE INSERT DATA
+-- ============================================
+
+-- Insert sample admin
+INSERT INTO adminProfile (accountEmail, password) VALUES 
+('admin@krafhibiscus.com', 'hashed_password_here');
+
+-- Insert sample products
+INSERT INTO Product (productID, productName, category, stock, price, accountEmail) VALUES
+('P001', 'Recycled Tote Bag', 'Bags', 50, 25.00, 'admin@krafhibiscus.com'),
+('P002', 'Fabric Coaster Set', 'Home Decor', 100, 15.00, 'admin@krafhibiscus.com'),
+('P003', 'Quilted Throw Pillow', 'Home Decor', 30, 45.00, 'admin@krafhibiscus.com'),
+('P004', 'Upcycled Apron', 'Apparel', 20, 35.00, 'admin@krafhibiscus.com');
+
+-- Insert product details
+INSERT INTO productDetails (productID, productName, category, stock, price, productDesc) VALUES
+('P001', 'Recycled Tote Bag', 'Bags', 50, 25.00, 'Handmade tote bag from recycled fabric'),
+('P002', 'Fabric Coaster Set', 'Home Decor', 100, 15.00, 'Set of 4 coasters made from upcycled materials'),
+('P003', 'Quilted Throw Pillow', 'Home Decor', 30, 45.00, 'Decorative pillow with recycled fabric patchwork'),
+('P004', 'Upcycled Apron', 'Apparel', 20, 35.00, 'Durable apron made from repurposed denim');
+
+-- Insert sample materials
+INSERT INTO Materials (materialID, materialName, category, quantity, source, accountEmail) VALUES
+('M001', 'Cotton Fabric Scraps', 'Fabric', 200, 'Donation', 'admin@krafhibiscus.com'),
+('M002', 'Denim Scraps', 'Fabric', 150, 'Donation', 'admin@krafhibiscus.com'),
+('M003', 'Polyester Thread', 'Thread', 50, 'Supplier A', 'admin@krafhibiscus.com'),
+('M004', 'Recycled Zippers', 'Hardware', 100, 'Supplier B', 'admin@krafhibiscus.com'),
+('M005', 'Button Assortment', 'Hardware', 300, 'Donation', 'admin@krafhibiscus.com');
+
+-- Insert materials details
+INSERT INTO materialsDetail (materialsID, materialName, category, quantity, supplier, source, unit, storageLocation) VALUES
+('M001', 'Cotton Fabric Scraps', 'Fabric', 200, 'Various Donors', 'Donation', 'kg', 'Shelve A1'),
+('M002', 'Denim Scraps', 'Fabric', 150, 'Various Donors', 'Donation', 'kg', 'Shelve A2'),
+('M003', 'Polyester Thread', 'Thread', 50, 'Supplier A', 'Supplier A', 'roll', 'Shelve B1'),
+('M004', 'Recycled Zippers', 'Hardware', 100, 'Supplier B', 'Supplier B', 'pcs', 'Shelve C1'),
+('M005', 'Button Assortment', 'Hardware', 300, 'Various Donors', 'Donation', 'pcs', 'Shelve C2');
+
+-- Insert sample suppliers
+INSERT INTO supplier (supplierID, supplierName, contactNumber, email, suppliedMaterials, accountEmail) VALUES
+('S001', 'Fabric Donation Centre', '012-3456789', 'donation@fabriccentre.com', 'Cotton Fabric Scraps', 'admin@krafhibiscus.com'),
+('S002', 'Thread Supplier A', '012-9876543', 'info@threadsupplier.com', 'Polyester Thread', 'admin@krafhibiscus.com'),
+('S003', 'Hardware Supply Co', '012-4567890', 'hardware@supplyco.com', 'Zippers, Buttons', 'admin@krafhibiscus.com');
+
+-- Insert supplier details
+INSERT INTO supplierDetails (supplierID, supplierName, contactNumber, email, suppliedMaterials, address, remarks) VALUES
+('S001', 'Fabric Donation Centre', '012-3456789', 'donation@fabriccentre.com', 'Cotton Fabric Scraps', '123 Jalan Fabric, 50000 Kuala Lumpur', 'Regular donor partner'),
+('S002', 'Thread Supplier A', '012-9876543', 'info@threadsupplier.com', 'Polyester Thread', '456 Jalan Thread, 60000 Selangor', 'Monthly supplier'),
+('S003', 'Hardware Supply Co', '012-4567890', 'hardware@supplyco.com', 'Zippers, Buttons', '789 Jalan Hardware, 70000 Perak', 'Bulk orders only');
+
+-- Sample stock in transaction
+INSERT INTO stockIn (materialsID, materialName, quantityAdded, source, accountEmail) VALUES
+('M001', 'Cotton Fabric Scraps', 50, 'Donation', 'admin@krafhibiscus.com');
+
+-- Sample stock out transaction
+INSERT INTO stockOut (materialsID, materialName, quantityDeducted, usedFor, accountEmail) VALUES
+('M001', 'Cotton Fabric Scraps', 10, 'Tote Bag Production', 'admin@krafhibiscus.com');
+
+-- ============================================
+-- USEFUL QUERIES
+-- ============================================
+
+-- View all inventory history
+-- SELECT * FROM inventoryHistory ORDER BY date DESC;
+
+-- View low stock materials
+-- CALL getLowStockItems();
+
+-- Generate inventory summary
+-- CALL generateInventorySummary('inventory report', '2026-01-01', '2026-06-30', 'admin@krafhibiscus.com');
+
+-- Check current stock status
+-- SELECT materialID, materialName, quantity, status FROM Materials;
+
+-- View supplier list
+-- SELECT * FROM supplier WHERE status = 'active';
