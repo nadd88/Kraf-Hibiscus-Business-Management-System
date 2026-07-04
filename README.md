@@ -1,7 +1,6 @@
 # Kraf Hibiscus Business Management System
 
 A web-based business management system for Kraf Hibiscus.  
-This repository is prepared for Progress Report 3 submission.
 
 ## Project Links
 
