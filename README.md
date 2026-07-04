@@ -34,10 +34,6 @@ A web-based business management system for Kraf Hibiscus.
 
 ---
 
-## Current Status
-
-The current version focuses on the frontend high-fidelity prototype, GitHub documentation, and project management preparation for Progress Report 3. Backend and database implementation are not included in this progress stage.
-
 ## Database Schema
 Module 1: Order & Customer Management
 The database schema for each module is defined below.
