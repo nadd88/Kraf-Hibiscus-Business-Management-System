@@ -47,7 +47,7 @@ The database schema for each module is defined below.
 |--------|-------|--------|
 | **Module 1: Order & Customer** | ` Product ` |  productID (PK), productName, category, stock, price, status (ENUM: in stock, low stock, out of stock)  |
 | | ` productDetails  ` |  productID, productName, category, stock, price, statusStock (ENUM), stockListing (ENUM), productDesc, createdDate, lastUpdated |
-| | ` newProduct  ` | | ` editProduct  ` | | ` deleteProduct ` |  productID, productName, category, stock, price, status (ENUM), productDesc |
+| | ` newProduct  ` ` editProduct  ` ` deleteProduct ` |  productID, productName, category, stock, price, status (ENUM), productDesc |
 | | ` editProduct  ` |  productID, productName, category, stock, price, statusStock (ENUM), stockListing (ENUM), productDesc, createdDate, lastUpdated |
 | | ` productDetails  ` |  productID, productName, category, stock, price, statusStock (ENUM), stockListing (ENUM), productDesc, createdDate, lastUpdated |
 
